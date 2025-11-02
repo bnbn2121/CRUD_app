@@ -15,11 +15,16 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     private static final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
     private static final String DEFAULT_SUBJECT = "Notification message";
-    @Value("${spring.mail.username}")
     private String fromEmail;
 
     public EmailServiceImpl(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
+    }
+
+    @Override
+    @Value("${spring.mail.username}")
+    public void setFromEmail(String fromEmail) {
+        this.fromEmail = fromEmail;
     }
 
     @Override
@@ -43,7 +48,7 @@ public class EmailServiceImpl implements EmailService {
         logger.info("sending message");
         if (eventDto == null || eventDto.getEvent() == null || eventDto.getEmail() == null) {
             logger.debug("error eventDto state");
-            throw new IllegalStateException("error eventDto state"); // сделать когда-нибудь обратную отправку в сервис об ошибке
+            throw new IllegalStateException("error eventDto state");
         }
         String message = switch (eventDto.getEvent()) {
             case CREATE -> "Здравствуйте! Ваш аккаунт был успешно создан";

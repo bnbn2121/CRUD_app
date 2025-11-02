@@ -18,8 +18,8 @@ public class KafkaConsumerService {
 
     @KafkaListener(topics = "user_events_topic", groupId = "email_notification")
     public void handleEvent(EventDto eventDto) {
-        System.out.println("получено из кафки");
         logger.info("receiving event from kafka");
         emailService.sendUserEventByEmail(eventDto);
+        logger.info("handled event by consumer");
     }
 }
