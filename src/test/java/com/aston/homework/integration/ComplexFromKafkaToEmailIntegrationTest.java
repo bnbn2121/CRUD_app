@@ -100,7 +100,7 @@ public class ComplexFromKafkaToEmailIntegrationTest {
     }
 
     @Test
-    void shouldSendAndReceivedEvent() throws Exception {
+    void shouldSendAndReceivedEventCreate() throws Exception {
         // Given
         EventDto eventDto = new EventDto(EventName.CREATE, "test@recipient.com");
 
@@ -120,6 +120,26 @@ public class ComplexFromKafkaToEmailIntegrationTest {
     }
 
     @Test
+    void shouldSendAndReceivedEventDelete() throws Exception {
+        // Given
+        EventDto eventDto = new EventDto(EventName.DELETE, "test@recipient.com");
+
+        // When
+        kafkaTemplate.send("user_events_topic", eventDto);
+        await().atMost(1000, TimeUnit.MILLISECONDS)
+                .pollInterval(200, TimeUnit.MILLISECONDS)
+                .until(() -> greenMail.getReceivedMessages().length > 0);
+
+        // Then
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertTrue(receivedMessages.length == 1);
+        Message message = receivedMessages[0];
+        assertEquals(message.getSubject(), "Notification message");
+        assertEquals(message.getContent().toString(), "Здравствуйте! Ваш аккаунт был удалён");
+        assertEquals(message.getAllRecipients()[0].toString(), "test@recipient.com");
+    }
+
+    @Test
     void shouldHandleInvalidEvent() throws Exception {
         // Given
         EventDto invalidEvent = new EventDto(EventName.FOR_TEST, "test@mail.com");
@@ -129,6 +149,7 @@ public class ComplexFromKafkaToEmailIntegrationTest {
         Thread.sleep(3000);
 
         // Then
+
         assertEquals(0, greenMail.getReceivedMessages().length);
     }
 }

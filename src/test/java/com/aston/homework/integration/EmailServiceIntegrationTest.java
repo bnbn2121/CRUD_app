@@ -52,7 +52,7 @@ public class EmailServiceIntegrationTest {
     }
 
     @Test
-    void shouldSendRealEmail() throws Exception {
+    void shouldSendRealEmailCreate() throws Exception {
         // Given
         EventDto eventDto = new EventDto(EventName.CREATE, "test@recipient.com");
 
@@ -66,5 +66,36 @@ public class EmailServiceIntegrationTest {
         assertEquals(message.getSubject(), "Notification message");
         assertEquals(message.getContent().toString(), "Здравствуйте! Ваш аккаунт был успешно создан");
         assertEquals(message.getAllRecipients()[0].toString(), "test@recipient.com");
+    }
+
+    @Test
+    void shouldSendRealEmailDelete() throws Exception {
+        // Given
+        EventDto eventDto = new EventDto(EventName.DELETE, "test@recipient.com");
+
+        // When
+        emailService.sendUserEventByEmail(eventDto);
+
+        // Then
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertTrue(receivedMessages.length == 1);
+        Message message = receivedMessages[0];
+        assertEquals(message.getSubject(), "Notification message");
+        assertEquals(message.getContent().toString(), "Здравствуйте! Ваш аккаунт был удалён");
+        assertEquals(message.getAllRecipients()[0].toString(), "test@recipient.com");
+    }
+
+    @Test
+    void shouldNotSendRealEmailWithInvalidEvent() throws Exception {
+        // Given
+        EventDto eventDto = new EventDto(EventName.FOR_TEST, "test@recipient.com");
+
+        // When
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> emailService.sendUserEventByEmail(eventDto));
+        Thread.sleep(3000);
+
+        // Then
+        assertTrue(greenMail.getReceivedMessages().length == 0);
+        assertEquals("Event name not found", exception.getMessage());
     }
 }

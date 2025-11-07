@@ -67,7 +67,7 @@ public class KafkaConsumerIntegrationTest {
     }
 
     @Test
-    void shouldSendAndReceivedEvent() throws Exception {
+    void shouldSendAndReceivedEventCreate() throws Exception {
         // Given
         EventDto eventDto = new EventDto(EventName.CREATE, "test@recipient.com");
         doNothing().when(emailService).sendUserEventByEmail(eventDtoCaptor.capture());
