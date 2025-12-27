@@ -1,0 +1,30 @@
+server:
+  port: 8081
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: false
+    hostname: ${HOSTNAME:localhost}
+
+spring:
+  config:
+    import:
+      - "classpath:configs/secret.yml"
+  mail:
+    host: smtp.mail.ru
+    port: 465
+    username: ${mail.username}
+    password: ${mail.password}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true

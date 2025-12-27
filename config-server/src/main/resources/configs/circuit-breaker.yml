@@ -1,0 +1,32 @@
+server:
+  port: 8083
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: false
+    hostname: ${HOSTNAME:localhost}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      crudServiceCircuitBreaker:
+        slidingWindowSize: 4
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 2
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        ignore-exceptions:
+          - "org.springframework.web.reactive.function.client.WebClientResponseException$NotFound"
+          - "org.springframework.web.reactive.function.client.WebClientResponseException$BadRequest"
+          - "org.springframework.web.reactive.function.client.WebClientResponseException$Conflict"
+
+target:
+  service:
+    url: http://user-service
