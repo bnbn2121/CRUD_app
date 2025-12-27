@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: service-discovery
+  config:
+    import: "configserver:http://${CONFIG.SERVER.HOST:localhost}:8888"
